@@ -1,0 +1,409 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --espresso: #1a1210;
+  --roast: #2a1f1a;
+  --roast-light: #3a2d25;
+  --caramel: #c8956c;
+  --cream: #e8c5a0;
+  --gold: #e8c06c;
+  --dusk: #7a4a6b;
+  --dusk-light: #9b6b8a;
+  --warm-white: #f0e6dc;
+  --warm-white-dim: #b0a090;
+  --error: #e85a5a;
+  --success: #5ac87a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: var(--foreground);
+  background: #0a0908;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  overscroll-behavior-y: none;
+}
+
+/* Hide scrollbar on body but allow content to scroll */
+body::-webkit-scrollbar { display: none; }
+body { scrollbar-width: none; -ms-overflow-style: none; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--roast);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--roast-light);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--caramel);
+}
+
+/* Slider styling */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-track {
+  height: 4px;
+  background: var(--roast-light);
+  border-radius: 2px;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--caramel);
+  margin-top: -5px;
+  border: 2px solid var(--espresso);
+}
+input[type='range']::-webkit-slider-thumb:hover {
+  background: var(--cream);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(200, 149, 108, 0.3); }
+  50% { box-shadow: 0 0 12px rgba(200, 149, 108, 0.6); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Note currently being played — subtle brightness only, no color shift */
+.note-playing {
+  filter: brightness(1.15);
+  z-index: 10;
+}
+
+/* Note hover in editor — glow outline */
+.note-hover-glow:hover {
+  filter: brightness(1.2) !important;
+  box-shadow: 0 0 8px rgba(240,230,220,0.3), inset 0 0 4px rgba(255,255,255,0.1) !important;
+  z-index: 5;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Smooth playhead glow trail */
+.playhead-glow {
+  will-change: transform;
+  transition-timing-function: linear;
+}
+.playhead-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  width: 10px;
+  background: linear-gradient(90deg, transparent, rgba(240,230,220,0.15), transparent);
+  pointer-events: none;
+}
+
+/* ── Mixer card streaming animation ── */
+@keyframes mixerCardStream {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.88);
+    filter: blur(6px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(1px);
+  }
+  75% {
+    transform: translateY(-3px) scale(1.015);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes mixerCardGlow {
+  0% {
+    box-shadow: 0 0 18px rgba(200, 149, 108, 0.45), inset 0 0 8px rgba(200, 149, 108, 0.1);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+@keyframes mixerIconPulse {
+  0% { transform: scale(0.5) rotate(-15deg); opacity: 0; }
+  60% { transform: scale(1.15) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes mixerPlaceholderPulse {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.12; }
+}
+
+.mixer-card-stream {
+  animation: mixerCardStream 0.55s cubic-bezier(0.22, 1, 0.36, 1) both,
+             mixerCardGlow 0.9s ease-out 0.3s both;
+}
+
+.mixer-icon-pulse {
+  animation: mixerIconPulse 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+
+.mixer-card-placeholder {
+  background: linear-gradient(135deg,
+    rgba(200, 149, 108, 0.04) 0%,
+    rgba(200, 149, 108, 0.08) 50%,
+    rgba(200, 149, 108, 0.04) 100%
+  );
+  animation: mixerPlaceholderPulse 1.2s ease-in-out infinite;
+}
+
+.mixer-track-container {
+  min-height: 180px;
+}
+
+/* Composition card in chat */
+@keyframes compCardStream {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.comp-card-stream {
+  animation: compCardStream 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Timeline track streaming animation */
+@keyframes timelineTrackStream {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+    max-height: 0;
+  }
+  40% {
+    max-height: 52px;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 52px;
+  }
+}
+
+.timeline-track-stream {
+  animation: timelineTrackStream 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Smooth RAF-driven scroll — disable browser smooth scroll to avoid conflicts */
+.timeline-scroll {
+  scroll-behavior: auto !important;
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Note streaming animation (dramatic entrance) ── */
+@keyframes noteStreamIn {
+  0% {
+    opacity: 0;
+    transform: scaleX(0) scaleY(0.3) translateY(4px);
+    filter: brightness(2.5) saturate(0);
+  }
+  25% {
+    opacity: 1;
+    transform: scaleX(1.25) scaleY(1.15) translateY(-2px);
+    filter: brightness(1.8) saturate(1.3);
+  }
+  45% {
+    transform: scaleX(0.92) scaleY(0.93) translateY(1px);
+    filter: brightness(1.2) saturate(1.1);
+  }
+  60% {
+    transform: scaleX(1.06) scaleY(1.04) translateY(0);
+    filter: brightness(1.1) saturate(1);
+  }
+  80% {
+    transform: scaleX(0.98) scaleY(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1) scaleY(1) translateY(0);
+    filter: brightness(1) saturate(1);
+  }
+}
+
+@keyframes noteStreamGlow {
+  0% {
+    box-shadow:
+      0 0 18px rgba(200, 149, 108, 0.8),
+      0 0 6px rgba(255, 255, 255, 0.5),
+      inset 0 0 8px rgba(255, 255, 255, 0.25);
+  }
+  40% {
+    box-shadow:
+      0 0 10px rgba(200, 149, 108, 0.4),
+      0 0 3px rgba(255, 255, 255, 0.2),
+      inset 0 0 3px rgba(255, 255, 255, 0.1);
+  }
+  100% {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes noteStreamShimmer {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.note-stream-in {
+  animation:
+    noteStreamIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    noteStreamGlow 0.8s ease-out 0.1s both;
+  transform-origin: left center;
+  overflow: hidden;
+}
+
+/* Shimmer sweep overlay — no position:relative needed, absolute parent is already positioned */
+.note-stream-in::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.45) 55%,
+    transparent 100%
+  );
+  animation: noteStreamShimmer 0.7s ease-out 0.15s both;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+
+/* Smooth transitions for interactive elements */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Studio Visualizer — music-reactive canvas behind all panels */
+.studio-viz {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+/* Semi-transparent panels so visualizer bleeds through */
+.studio-shell .bg-roast { background: rgba(42, 31, 26, 0.88) !important; }
+.studio-shell .bg-espresso { background: rgba(26, 18, 16, 0.82) !important; }
+
+/* App UI accent touches — neon cream highlights */
+.studio-shell header {
+  border-image: linear-gradient(90deg, transparent, rgba(232,192,108,0.25), rgba(200,149,108,0.2), rgba(232,192,108,0.25), transparent) 1;
+}
+.studio-shell header .bg-gradient-to-br {
+  box-shadow: 0 0 14px rgba(232,192,108,0.3), 0 0 4px rgba(200,149,108,0.2);
+}
+/* Transport bar top border accent */
+.studio-shell .border-t.border-roast-light {
+  border-image: linear-gradient(90deg, transparent, rgba(232,192,108,0.18), rgba(200,149,108,0.15), rgba(139,107,123,0.12), rgba(232,192,108,0.18), transparent) 1;
+}
+
+/* Neon cream glow on active/focus buttons in studio */
+.studio-shell button:focus-visible {
+  outline: 1px solid rgba(232,192,108,0.5);
+  outline-offset: 1px;
+  box-shadow: 0 0 8px rgba(232,192,108,0.2);
+}
+
+/* Subtle neon cream edge glow on chat panel */
+.studio-shell .w-\[340px\] {
+  border-right: 1px solid rgba(232,192,108,0.08);
+  box-shadow: 1px 0 12px rgba(232,192,108,0.04);
+}
+
+/* Neon cream accent on range slider active state */
+input[type='range']:active::-webkit-slider-thumb {
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(232,192,108,0.5);
+}
+
+/* Chat markdown rendering */
+.chat-markdown p { margin: 0 0 0.5em 0; line-height: 1.5; }
+.chat-markdown p:last-child { margin-bottom: 0; }
+.chat-markdown strong { color: var(--cream); font-weight: 700; }
+.chat-markdown em { color: var(--caramel); font-style: italic; }
+.chat-markdown code {
+  background: rgba(200,149,108,0.12); color: var(--caramel);
+  padding: 1px 5px; border-radius: 4px; font-size: 0.85em;
+  font-family: 'Fira Code', 'Consolas', monospace;
+}
+.chat-markdown pre {
+  background: rgba(0,0,0,0.3); padding: 8px 10px; border-radius: 6px;
+  overflow-x: auto; margin: 6px 0; font-size: 0.82em;
+}
+.chat-markdown pre code { background: none; padding: 0; }
+.chat-markdown ol, .chat-markdown ul {
+  margin: 4px 0; padding-left: 1.4em;
+}
+.chat-markdown li { margin: 2px 0; }
+.chat-markdown h1, .chat-markdown h2, .chat-markdown h3 {
+  color: var(--cream); margin: 0.6em 0 0.3em; font-weight: 700;
+}
+.chat-markdown h1 { font-size: 1.1em; }
+.chat-markdown h2 { font-size: 1em; }
+.chat-markdown h3 { font-size: 0.95em; }
+.chat-markdown blockquote {
+  border-left: 3px solid var(--caramel); padding-left: 10px;
+  margin: 6px 0; color: var(--warm-white-dim); font-style: italic;
+}
+.chat-markdown a { color: var(--caramel); text-decoration: underline; }
+.chat-markdown hr {
+  border: none; border-top: 1px solid var(--roast-light); margin: 8px 0;
+}

@@ -1,0 +1,135 @@
+**ACT AS:**
+A world-class Creative Developer (Awwwards-level) specializing in Next.js 14, Framer Motion, and immersive web interactions.
+
+**THE TASK:**
+Build a high-end "Scrollytelling" landing page for BrewBeats — an AI-powered music composition app where users type prompts and get multi-track compositions synthesized in the browser via Tone.js. The core mechanic is a scroll-linked animation that plays an image sequence of a coffee cup "transforming" into sound waves / musical waveforms as the user scrolls down (coffee-to-music metaphor). The landing page REPLACES the existing `LandingPage.tsx` component.
+
+**EXISTING PROJECT CONTEXT:**
+This is an existing Next.js 14 (App Router) project with Tailwind CSS and Zustand. The landing page component receives an `onEnterApp: () => void` prop that transitions to the main app. The project uses a "Dusk Coffee" color palette — warm dark tones inspired by coffee culture.
+
+**TECH STACK (already installed in project):**
+- Framework: Next.js 14 (App Router) with TypeScript
+- Styling: Tailwind CSS (config already extended with custom colors)
+- Animation: Framer Motion (already a dependency)
+- Rendering: HTML5 Canvas (for the image sequence — performant, no extra deps)
+
+**EXISTING COLOR PALETTE (Tailwind `tailwind.config.ts` already has these):**
+- `espresso`: #1a1210 (deepest background)
+- `roast`: #2a1f1a (card/surface background)
+- `roast-light`: #3a2d25 (borders, subtle surfaces)
+- `caramel`: #c8956c (primary accent — buttons, highlights)
+- `cream`: #e8c5a0 (secondary text, warm highlights)
+- `dusk`: #7a4a6b (purple accent)
+- `dusk-light`: #9b6b8a (lighter purple)
+- `warm-white`: #f0e6dc (headings, bright text)
+- `warm-dim`: #b0a090 (muted/dim text)
+
+**VISUAL DIRECTION & COLOR:**
+- **Seamless Blending:** The page background MUST be `bg-espresso` (#1a1210). If using an image sequence, the image backgrounds must match this exact color so edges are invisible. If no image sequence is available, use a canvas-drawn procedural animation (coffee cup outline morphing into waveform shapes using simple vector paths).
+- **Color Usage:** Use `text-warm-white` or `text-cream` for headings, `text-warm-dim` for body text, `text-caramel` for accents/CTAs, `bg-roast` for cards, `border-roast-light` for borders.
+- **Typography:** Use the project's existing font stack (Geist Sans / system-ui). Clean, tracking-tight, minimalist.
+- **Vibe:** Premium, moody, coffeehouse-meets-recording-studio. Think Ableton's website meets a specialty coffee brand.
+
+**IMPLEMENTATION DETAILS:**
+
+1. **The "Sticky" Canvas (HeadphoneScroll.tsx → BrewBeatsScroll.tsx):**
+   - Create a component called `BrewBeatsScroll.tsx` in `src/components/`.
+   - Container: `h-[400vh]` (4x viewport height for scroll room).
+   - Inside: a `<canvas>` element that is `sticky top-0 h-screen w-full`.
+   - Canvas is centered and scales correctly on mobile (contain fit).
+   - **If using image sequence:** Load frames from `/public/frames/` with naming convention `frame_[i]_delay-0.04s.webp` (120 frames). Place your exported webp frames there.
+   - **If no image sequence available (PREFERRED for this project):** Draw a PROCEDURAL animation on canvas:
+     - Frame 0-30 (0-25% scroll): A stylized coffee cup with steam rising (vector paths, caramel/cream strokes on espresso background).
+     - Frame 30-70 (25-58% scroll): The cup "dissolves" — particles scatter outward, morphing into circular waveform/equalizer bars radiating from center.
+     - Frame 70-100 (58-83% scroll): Full waveform visualization — equalizer bars pulsing, musical notes floating, sound waves rippling outward.
+     - Frame 100-120 (83-100% scroll): Everything converges into the BrewBeats logo / a "play" button shape.
+   - Use `useScroll` from Framer Motion to map scroll progress (0→1) to frame index (0→119).
+   - Draw the current frame to canvas on every scroll tick using `useMotionValueEvent` or `useTransform`.
+
+2. **The Scroll Logic:**
+   - Use `useScroll({ target: containerRef })` scoped to the scroll container.
+   - `useTransform(scrollYProgress, [0, 1], [0, 119])` for frame mapping.
+   - On each frame change, redraw the canvas.
+   - For procedural: render the appropriate animation state based on progress float (0.0 → 1.0) — no need for discrete frames, draw directly from progress value.
+
+3. **Text Overlays (The Story — fading in/out over the canvas):**
+   Using Framer Motion's `useTransform` for opacity mapped to scroll ranges:
+
+   - **0-15% Scroll:** Hero section.
+     - "BrewBeats" (large, `text-warm-white`, tracking-tighter)
+     - "Compose music with words." (subtitle, `text-warm-dim`)
+     - Subtle down-arrow scroll indicator animated with `animate={{ y: [0, 8, 0] }}`.
+
+   - **20-40% Scroll:** Feature reveal 1 (left-aligned).
+     - "Prompt to Beat" (`text-cream`, text-3xl font-bold)
+     - "Describe your sound. Our AI composes a full multi-track arrangement — drums, bass, melody, pads, and more." (`text-warm-dim`, max-w-md)
+     - *Canvas shows: cup dissolving into particles.*
+
+   - **45-65% Scroll:** Feature reveal 2 (right-aligned).
+     - "Visual Timeline" (`text-cream`)
+     - "See every note on a professional DAW-style grid. Click to edit. Hear changes instantly." (`text-warm-dim`)
+     - *Canvas shows: waveform visualization forming.*
+
+   - **70-85% Scroll:** Feature reveal 3 (centered).
+     - "Mix Like a Pro" (`text-cream`)
+     - "Per-track volume, reverb, delay, mute & solo. A full mixing console in your browser." (`text-warm-dim`)
+     - *Canvas shows: full audio visualization.*
+
+   - **88-100% Scroll:** CTA section (centered).
+     - "Start Brewing" (`text-caramel`, text-4xl, font-bold)
+     - A glowing CTA button: "Open Studio →" with `bg-caramel text-espresso` styling, hover glow effect.
+     - Button calls `onEnterApp()` on click.
+     - *Canvas shows: convergence into play button shape.*
+
+4. **Loading State:**
+   - If using image sequence: Show a minimal loading spinner (`border-caramel`) while preloading all frames. Track loaded count. Only render the scroll content once all frames are loaded.
+   - If procedural: No loading needed — canvas draws instantly.
+
+5. **Polish & Micro-interactions:**
+   - Smooth `scroll-behavior: smooth` on the page.
+   - Text sections use `motion.div` with opacity transitions (not abrupt show/hide).
+   - The CTA button has a subtle `boxShadow` glow animation: `animate={{ boxShadow: ['0 0 20px rgba(200,149,108,0.3)', '0 0 40px rgba(200,149,108,0.6)', '0 0 20px rgba(200,149,108,0.3)'] }}`.
+   - Add a thin progress bar at the very top of the viewport (`fixed top-0`) showing scroll progress, colored `bg-caramel`, height 2px.
+   - Particle effects during the "dissolve" phase should use the palette: caramel, cream, dusk, warm-dim particles on espresso background.
+
+6. **Component Interface:**
+   ```tsx
+   // BrewBeatsScroll.tsx
+   interface BrewBeatsScrollProps {
+     onEnterApp: () => void;
+   }
+   ```
+
+   ```tsx
+   // LandingPage.tsx (updated to use the scroll component)
+   'use client';
+   import { BrewBeatsScroll } from './BrewBeatsScroll';
+
+   interface LandingPageProps {
+     onEnterApp: () => void;
+   }
+
+   export function LandingPage({ onEnterApp }: LandingPageProps) {
+     return <BrewBeatsScroll onEnterApp={onEnterApp} />;
+   }
+   ```
+
+7. **Mobile Responsiveness:**
+   - Text sizes scale down on mobile (use responsive Tailwind: `text-4xl md:text-6xl lg:text-7xl`).
+   - Canvas maintains aspect ratio and centers within viewport.
+   - Text overlays use responsive padding (`px-6 md:px-12 lg:px-24`).
+   - The scroll distance may feel long on mobile — consider `h-[300vh] md:h-[400vh]`.
+
+**FILE STRUCTURE TO GENERATE:**
+1. `src/components/BrewBeatsScroll.tsx` — The main scrollytelling canvas + text overlay component.
+2. `src/components/LandingPage.tsx` — Updated wrapper (thin, just renders BrewBeatsScroll).
+3. Any additions to `src/app/globals.css` — Only if needed for canvas/scroll styles.
+
+**IMPORTANT CONSTRAINTS:**
+- Do NOT add new npm dependencies. Only use: React, Next.js, Tailwind CSS, Framer Motion (all already installed).
+- Do NOT modify `tailwind.config.ts` — the color palette is already configured.
+- The `onEnterApp` callback MUST be wired to the CTA button so users can enter the main app.
+- Keep the component self-contained — no external API calls, no server components.
+- Prefer the PROCEDURAL canvas animation approach (no image assets needed) so this works out of the box without requiring an image sequence export.
+- All animations must be buttery smooth — 60fps, no jank, no layout thrashing.
+- The page should feel premium and intentional, not generic or template-like.
