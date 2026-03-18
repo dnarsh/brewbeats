@@ -18,6 +18,7 @@ export interface InstrumentConfig {
     instrument: AnyInstrument;
     reverb: any;
     delay: any;
+    eq?: Tone.EQ3;
   };
 }
 
@@ -25,24 +26,29 @@ export interface InstrumentConfig {
  *  OPTIMIZED (sharedFx): synth → volume → destination (dry), volume → Gain sends → shared buses
  *  LEGACY (no sharedFx): synth → volume → delay → reverb → destination (for offline export) */
 function createWithEffects(synth: AnyInstrument, volumeNode: Tone.Volume, sharedFx?: SharedEffects) {
+  // Per-track 3-band EQ (low/mid/high) — default flat
+  const eq = new Tone.EQ3({ low: 0, mid: 0, high: 0, lowFrequency: 250, highFrequency: 4000 });
+
   if (sharedFx) {
-    // OPTIMIZED: shared effect buses — lightweight Gain sends instead of per-track Freeverb/Delay
+    // OPTIMIZED: synth → EQ → volume → destination + send buses
     const reverbSend = new Tone.Gain(0);
     const delaySend = new Tone.Gain(0);
-    synth.connect(volumeNode);
+    synth.connect(eq);
+    eq.connect(volumeNode);
     volumeNode.toDestination();
     volumeNode.connect(reverbSend);
     volumeNode.connect(delaySend);
     reverbSend.connect(sharedFx.reverb);
     delaySend.connect(sharedFx.delay);
-    return { instrument: synth, reverb: reverbSend, delay: delaySend };
+    return { instrument: synth, reverb: reverbSend, delay: delaySend, eq };
   }
   // LEGACY: per-track effects (offline export only)
   const reverb = new Tone.Freeverb({ dampening: 3000, roomSize: 0.7, wet: 0 }).toDestination();
   const delay = new Tone.FeedbackDelay({ delayTime: '8n', feedback: 0.2, wet: 0 }).connect(reverb);
+  synth.connect(eq);
+  eq.connect(volumeNode);
   volumeNode.connect(delay);
-  synth.connect(volumeNode);
-  return { instrument: synth, reverb, delay };
+  return { instrument: synth, reverb, delay, eq };
 }
 
 export const instrumentRegistry: Record<string, InstrumentConfig> = {

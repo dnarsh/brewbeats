@@ -14,8 +14,9 @@ const LOOKAHEAD_S = 0.08;         // Scheduling lookahead (lower = more responsi
 
 interface ActiveInstrument {
   instrument: AnyInstrument;
-  reverb?: any;   // Tone.Gain (shared bus send) or Tone.Freeverb (legacy)
-  delay?: any;    // Tone.Gain (shared bus send) or Tone.FeedbackDelay (legacy)
+  reverb?: any;
+  delay?: any;
+  eq?: Tone.EQ3;
   volume: Tone.Volume;
   parts: Tone.Part[];
   usesSharedFx: boolean;
@@ -280,7 +281,7 @@ export class AudioEngine {
         ? { reverb: this.sharedReverb, delay: this.sharedDelay }
         : undefined;
 
-    const { instrument, reverb, delay } = entry.create(volume, sharedFx);
+    const { instrument, reverb, delay, eq } = entry.create(volume, sharedFx);
 
     // Set effect send levels
     if (sharedFx) {
@@ -347,6 +348,7 @@ export class AudioEngine {
       instrument,
       reverb,
       delay,
+      eq,
       volume,
       parts,
       usesSharedFx: !!sharedFx,
@@ -459,6 +461,17 @@ export class AudioEngine {
       } else {
         // Legacy mode: node is Freeverb or FeedbackDelay
         node.wet.value = val;
+      }
+    });
+  }
+
+  /** Set per-track 3-band EQ (low/mid/high in dB, range: -12 to +12) */
+  setTrackEQ(instrument: string, band: 'low' | 'mid' | 'high', db: number) {
+    const val = Math.max(-12, Math.min(12, db));
+    this.trackKeys(instrument).forEach((key) => {
+      const active = this.instruments.get(key);
+      if (active?.eq) {
+        active.eq[band].value = val;
       }
     });
   }

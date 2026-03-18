@@ -407,3 +407,13 @@ input[type='range']:active::-webkit-slider-thumb {
 .chat-markdown hr {
   border: none; border-top: 1px solid var(--roast-light); margin: 8px 0;
 }
+
+/* Mobile responsive — stack panels vertically, shrink timeline */
+@media (max-width: 768px) {
+  .timeline-scroll { touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; }
+  .track-label { font-size: 10px !important; min-width: 60px !important; max-width: 60px !important; }
+  .note-cell { min-width: 14px !important; min-height: 14px !important; }
+  .mixer-panel { flex-direction: column !important; }
+  .transport-bar { flex-wrap: wrap !important; gap: 4px !important; }
+  .transport-bar button { padding: 4px 8px !important; font-size: 11px !important; }
+}
