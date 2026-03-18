@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BrewBeats
 
-## Getting Started
+AI-powered browser music studio. Describe what you want to hear, get a multi-track composition in seconds.
 
-First, run the development server:
+## What It Does
+
+- **Text to Music** — Type a prompt like "chill lo-fi beat with jazzy piano" and get a full composition
+- **Beat Editor** — Visual grid editor with pencil, eraser, and select tools
+- **AI Music Advisor** — Reviews your beat, suggests improvements as ghost notes you can accept or reject
+- **8 Genre Presets** — Lo-fi, Jazz, Hip-hop, Electronic, Rock, R&B, Ambient, Classical
+- **Real-Time Synthesis** — Pure Tone.js audio, no samples needed
+- **MIDI + WAV Export** — Download your compositions for any DAW
+- **Per-Track EQ** — 3-band equalizer (low/mid/high) on every instrument
+- **Session Management** — Auto-saves your work
+
+## Quick Start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`. No API key needed — uses Pollinations free AI by default.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Optionally set `NVIDIA_API_KEY` in `.env.local` for access to 130+ models.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- **Next.js 14** + TypeScript
+- **Tone.js** — Browser audio synthesis
+- **Zustand** — State management with undo/redo
+- **Tailwind CSS** — Styling with custom Dusk Coffee palette
+- **Framer Motion** — Animations
+- **Pollinations AI** — Free LLM API (no key required)
 
-To learn more about Next.js, take a look at the following resources:
+## Keyboard Shortcuts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Key | Action |
+|-----|--------|
+| Space | Play / Pause |
+| Escape | Stop |
+| Ctrl+Z | Undo |
+| Ctrl+Y | Redo |
+| 1 / 2 / 3 | Pencil / Eraser / Select tool |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
