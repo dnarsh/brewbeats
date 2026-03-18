@@ -9,8 +9,9 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.LOCAL_ENGINE_API_KEY || process.env.NVIDIA_API_KEY;
     let model = body.model || process.env.LOCAL_ENGINE_MODEL || process.env.NVIDIA_MODEL || 'meta/llama-4-maverick-17b-128e-instruct';
 
-    if (!apiKey) {
-      return NextResponse.json({ error: 'AI engine not configured.' }, { status: 500 });
+    const usePollinations = !apiKey || model.startsWith('pollinations/');
+    if (usePollinations) {
+      model = model.replace('pollinations/', '') || 'openai';
     }
 
     if (model.startsWith('local/') && model !== 'local/nano-9b-v2') {
@@ -48,12 +49,16 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 120000);
 
-    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    const apiUrl = usePollinations
+      ? 'https://gen.pollinations.ai/v1/chat/completions'
+      : 'https://integrate.api.nvidia.com/v1/chat/completions';
+
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (!usePollinations && apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
+      headers,
       body: JSON.stringify(requestBody),
       signal: controller.signal,
     });
