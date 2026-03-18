@@ -43,6 +43,15 @@ Optionally set `NVIDIA_API_KEY` in `.env.local` for access to 130+ models.
 | Ctrl+Y | Redo |
 | 1 / 2 / 3 | Pencil / Eraser / Select tool |
 
+## Feedback & Suggestions
+
+Found a bug? Have an idea to make BrewBeats better? Open an issue:
+
+- **[Report a Bug](https://github.com/aiton08255/brewbeats/issues/new?template=bug_report.md)**
+- **[Suggest a Feature](https://github.com/aiton08255/brewbeats/issues/new?template=feature_request.md)**
+
+All feedback is welcome — quality of life improvements, new genre ideas, UI tweaks, anything.
+
 ## License
 
 MIT
