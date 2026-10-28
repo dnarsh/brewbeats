@@ -47,8 +47,8 @@ Optionally set `NVIDIA_API_KEY` in `.env.local` for access to 130+ models.
 
 Found a bug? Have an idea to make BrewBeats better? Open an issue:
 
-- **[Report a Bug](https://github.com/aiton08255/brewbeats/issues/new?template=bug_report.md)**
-- **[Suggest a Feature](https://github.com/aiton08255/brewbeats/issues/new?template=feature_request.md)**
+- **[Report a Bug](https://github.com/dnarsh/brewbeats/issues/new?template=bug_report.md)**
+- **[Suggest a Feature](https://github.com/dnarsh/brewbeats/issues/new?template=feature_request.md)**
 
 All feedback is welcome — quality of life improvements, new genre ideas, UI tweaks, anything.
 
